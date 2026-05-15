@@ -4,6 +4,7 @@ import PhotoPreview from '../components/PhotoPreview';
 import BackgroundSelector from '../components/BackgroundSelector';
 import SizeSelector from '../components/SizeSelector';
 import './EditorPage.css';
+import EmptyState from '../components/EmptyState';
 
 /**
  * EditorPage — Step 2.
@@ -17,12 +18,7 @@ function EditorPage() {
   const [background, setBackground] = useState('white');
   const [sizePreset, setSizePreset]  = useState('35x45');
   const [isProcessing, setIsProcessing] = useState(false);
-
-  // If user lands here directly without uploading, redirect
-  if (!state?.localUrl) {
-    navigate('/upload');
-    return null;
-  }
+  
 
   const handleProcess = async () => {
     setIsProcessing(true);
@@ -50,6 +46,17 @@ function EditorPage() {
       },
     });
   };
+// If user lands here directly without uploading, redirect
+
+  if (!state?.localUrl) {
+  return (
+    <EmptyState
+      title="No photo selected yet"
+      description="Please upload a passport photo before accessing the editor."
+      buttonText="Go to Upload"
+    />
+  );
+}
 
   return (
     <div className="editor-page page-content">

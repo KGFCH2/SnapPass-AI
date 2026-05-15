@@ -3,6 +3,7 @@ import { useLocation, useNavigate, Link } from 'react-router-dom';
 import QuantityInput from '../components/QuantityInput';
 import PrintButton from '../components/PrintButton';
 import './PrintPreviewPage.css';
+import EmptyState from '../components/EmptyState';
 
 /**
  * PrintPreviewPage — Step 3 & 4.
@@ -11,15 +12,10 @@ import './PrintPreviewPage.css';
  */
 function PrintPreviewPage() {
   const { state } = useLocation();
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
 
   const [quantity, setQuantity] = useState(6);
   const [isGenerating, setIsGenerating] = useState(false);
-
-  if (!state?.processedUrl) {
-    navigate('/upload');
-    return null;
-  }
 
   const handleGenerateSheet = async () => {
     setIsGenerating(true);
@@ -41,6 +37,18 @@ function PrintPreviewPage() {
 
   // Build grid of photo slots
   const slots = Array.from({ length: quantity });
+
+  // If user lands here directly without uploading, redirect
+
+  if (!state?.processedUrl) {
+  return (
+    <EmptyState
+      title="No processed photo available"
+      description="Upload and process a photo before accessing print preview."
+      buttonText="Upload Photo"
+    />
+  );
+}
 
   return (
     <div className="print-page page-content">

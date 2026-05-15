@@ -45,7 +45,7 @@ function PhotoPreview({ originalUrl, processedUrl, isProcessing }) {
                 <div className="photo-preview__spinner" aria-label="Processing" />
               ) : (
                 <p className="photo-preview__empty-text">
-                  Processed photo<br />will appear here
+                  Upload and process a photo to preview the AI-generated result
                 </p>
               )}
             </div>
