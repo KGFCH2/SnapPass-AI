@@ -36,7 +36,7 @@ function HomePage() {
           </p>
           <div className="hero__actions">
             <Link to="/upload" className="btn btn-primary hero__btn-primary">
-              📤 Upload Your Photo
+              Upload Your Photo
             </Link>
           </div>
         </div>
