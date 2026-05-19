@@ -3,10 +3,9 @@
  * @use This service is used in the password reset flow to create OTPs, verify them, and update their state as needed.
  */
 
-import { createPasswordResetOtp, findValidOtp, updateOtpState } from "../dao/passwordResetOtp.dao.js";
+import { createPasswordResetOtp, findLatestPendingOtp, incrementOtpAttempts, updateOtpState } from "../dao/passwordResetOtp.dao.js";
 import { generateOTP } from "../utils/generateOTP.js";
 import AppError from "../utils/errors/AppError.js";
-import NotFoundError from "../utils/errors/NotFoundError.js";
 
 export async function generateAndStoreOtp(userId) {
     const otp = generateOTP();
@@ -15,17 +14,27 @@ export async function generateAndStoreOtp(userId) {
 }
 
 export async function checkOtpValidity(userId, otp) {
-    const validOtp = await findValidOtp(userId, otp);
-    if (!validOtp) {
+    const pendingOtpRecord = await findLatestPendingOtp(userId);
+    if (!pendingOtpRecord) {
         throw new AppError("Invalid or expired OTP", 400);
     }
-    return validOtp;
+    
+    if (pendingOtpRecord.otp !== otp) {
+        // Increment attempts and fail
+        const updatedRecord = await incrementOtpAttempts(pendingOtpRecord._id);
+        if (updatedRecord.attempts >= 5) {
+            await updateOtpState(pendingOtpRecord._id, "reject");
+            throw new AppError("Too many incorrect attempts, this OTP has been invalidated.", 400);
+        }
+        throw new AppError("Invalid or expired OTP", 400);
+    }
+
+    return pendingOtpRecord;
 }
 
 export async function verifyOtp(userId, otp) {
-    const validOtp = await findValidOtp(userId, otp);
-    if (!validOtp) {
-        throw new AppError("Invalid or expired OTP", 400);
-    }
-    return await updateOtpState(validOtp._id, "resolve"); // Changed from "resolved" to "resolve" to match the MongoDB schema enum
+    // Rely on checkOtpValidity to handle attempts checking and rejection
+    const validOtp = await checkOtpValidity(userId, otp);
+    
+    return await updateOtpState(validOtp._id, "resolve");
 }
