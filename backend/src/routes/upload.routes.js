@@ -11,7 +11,7 @@ import { uploadMiddleware } from "../middleware/upload.middleware.js";
 
 const router = express.Router();
 
-// router.post("/", uploadMiddleware.single("photo"), validateUpload, uploadPhoto);
+router.post("/", uploadMiddleware.single("photo"), uploadPhoto);
 router.get("/:fileId", getUploadedPhoto);
 
 export default router;
