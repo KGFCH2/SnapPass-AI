@@ -22,17 +22,13 @@ function usePhotoUpload() {
       // Create local preview immediately
       const localUrl = URL.createObjectURL(file);
 
-      // TODO: uncomment when backend is ready
-      // const formData = new FormData();
-      // formData.append('photo', file);
-      // const res = await fetch('/api/upload', { method: 'POST', body: formData });
-      // if (!res.ok) throw new Error('Upload failed');
-      // const data = await res.json();
-      // setUploadedFile({ ...data.data, localUrl });
-
-      // Placeholder — simulate network delay
-      await new Promise((r) => setTimeout(r, 600));
-      setUploadedFile({ filename: file.name,fileSize: file.size, fileUrl: localUrl, localUrl });
+      const formData = new FormData();
+      formData.append('photo', file);
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5005/api';
+      const res = await fetch(`${apiUrl}/upload`, { method: 'POST', body: formData });
+      if (!res.ok) throw new Error('Upload failed');
+      const data = await res.json();
+      setUploadedFile({ ...data.data, localUrl });
     } catch (err) {
       setError(err.message || 'Upload failed. Please try again.');
     } finally {

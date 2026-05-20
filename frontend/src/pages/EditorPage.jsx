@@ -63,28 +63,48 @@ function EditorPage() {
   const handleProcess = async () => {
     setIsProcessing(true);
 
-    // TODO: Call backend POST /api/process with { filename, backgroundColour, photoSizePreset }
-    // const res = await fetch('/api/process', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ filename: state.filename, backgroundColour: background, photoSizePreset: sizePreset }),
-    // });
-    // const blob = await res.blob();
-    // const processedUrl = URL.createObjectURL(blob);
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5005/api';
+      
+      const backgroundHex = {
+        'white': '#ffffff',
+        'off-white': '#f5f0e8',
+        'light-grey': '#d1d5db',
+        'light-blue': '#bfdbfe',
+        'light-red': '#fecaca'
+      }[background] || '#ffffff';
 
-    // Simulate processing delay
-    await new Promise((r) => setTimeout(r, 1500));
+      const res = await fetch(`${apiUrl}/process`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          filename: photoData.filename,
+          backgroundColour: backgroundHex,
+          photoSizePreset: sizePreset,
+        }),
+      });
 
-    setIsProcessing(false);
+      if (!res.ok) {
+        throw new Error('AI processing failed');
+      }
 
-    // Navigate to print preview — pass original url as placeholder for processed for now
-    navigate('/print-preview', {
-      state: {
-        processedUrl: photoData.localUrl, // replace with real processedUrl after backend integration
-        background,
-        sizePreset,
-      },
-    });
+      const blob = await res.blob();
+      const processedUrl = URL.createObjectURL(blob);
+
+      setIsProcessing(false);
+
+      navigate('/print-preview', {
+        state: {
+          processedUrl,
+          background,
+          sizePreset,
+        },
+      });
+    } catch (error) {
+      console.error('Processing error:', error);
+      setIsProcessing(false);
+      alert('Failed to process image. Please check if backend services are running.');
+    }
   };
   // If user lands here directly without uploading, redirect
 
