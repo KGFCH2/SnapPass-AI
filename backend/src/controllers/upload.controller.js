@@ -5,7 +5,8 @@
  */
 
 import { v4 as uuidv4 } from "uuid";
-import { config } from "../config/config.js";
+import fs from "fs/promises";
+import { uploadImage } from "../service/cloudinary.service.js";
 import Upload from "../models/upload.model.js";
 
 /**
@@ -13,14 +14,28 @@ import Upload from "../models/upload.model.js";
  * Accepts a multipart image upload and responds with the stored file path.
  */
 export const uploadPhoto = async (req, res, next) => {
+  let localPath;
   try {
     // multer middleware has already saved the file at this point
     if (!req.file) {
       return res.status(400).json({ success: false, message: "No file uploaded." });
     }
 
+    localPath = req.file.path;
     const fileId = uuidv4();
-    const fileUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+    const cloudinaryResult = await uploadImage(localPath);
+    const fileUrl = cloudinaryResult.secure_url;
+
+    if (req.user?.id) {
+      await Upload.create({
+        user: req.user.id,
+        fileId,
+        originalName: req.file.originalname,
+        fileUrl,
+        mimeType: req.file.mimetype,
+        sizeBytes: req.file.size,
+      });
+    }
 
     // await Upload.create({
     //   fileId,
@@ -39,12 +54,21 @@ export const uploadPhoto = async (req, res, next) => {
         filename: req.file.filename,
         originalName: req.file.originalname,
         fileUrl,
+        publicId: cloudinaryResult.public_id,
         mimetype: req.file.mimetype,
         size: req.file.size,
       },
     });
   } catch (error) {
     next(error);
+  } finally {
+    if (localPath) {
+      try {
+        await fs.unlink(localPath);
+      } catch (_error) {
+        // Best-effort cleanup, ignore failures.
+      }
+    }
   }
 };
 
