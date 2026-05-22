@@ -7,8 +7,8 @@
   background:
     radial-gradient(1200px 600px at 10% -10%, rgba(37, 99, 235, 0.12), transparent 60%),
     radial-gradient(900px 500px at 90% 0%, rgba(14, 116, 144, 0.14), transparent 55%);
-  margin: 0px;
-  padding: 0px;
+  margin-top: -120px;
+  padding-top: 140px;
 }
 
 .home-page::after {
@@ -622,7 +622,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  
+
   padding-left: var(--space-xl);
   padding-right: var(--space-xl);
   padding-bottom: var(--space-3xl);
