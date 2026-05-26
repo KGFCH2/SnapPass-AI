@@ -45,8 +45,7 @@ export async function getUserByEmail(email) {
 }
 
 export async function updatePassword(userId, newPassword) {
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    const user = await updateUserPassword(userId, hashedPassword);
+    const user = await updateUserPassword(userId, newPassword);
     if (!user) {
         throw new NotFoundError("User not found");
     }
