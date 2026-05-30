@@ -20,6 +20,9 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+// Enable trust proxy for rate limiting behind reverse proxies
+app.set('trust proxy', 1);
+
 // Apply rate limiter to all API routes
 app.use('/api', apiLimiter);
 
