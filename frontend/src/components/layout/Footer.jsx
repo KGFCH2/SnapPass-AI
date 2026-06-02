@@ -25,8 +25,11 @@ function Footer({ darkMode }) {
       role="contentinfo"
     >
       {/* Decorative top wave */}
-      {!darkMode && (
-        <div className="footer__wave-container">
+          <div
+            className={`footer__wave-container ${
+              darkMode ? 'footer__wave-container-dark' : ''
+            }`}
+          >
           <svg
             className="footer__wave"
             xmlns="http://www.w3.org/2000/svg"
@@ -63,7 +66,7 @@ function Footer({ darkMode }) {
             </g>
           </svg>
         </div>
-      )}
+      
 
       <div className="footer__container">
         {/* CTA SECTION */}
@@ -112,9 +115,8 @@ function Footer({ darkMode }) {
             >
               <span
                 aria-hidden="true"
-                className={`footer__logo-icon ${
-                  darkMode ? 'footer__logo-icon-dark' : ''
-                }`}
+                className={`footer__logo-icon ${darkMode ? 'footer__logo-icon-dark' : ''
+                  }`}
               >
                 📷
               </span>
@@ -122,9 +124,8 @@ function Footer({ darkMode }) {
             </span>
 
             <p
-              className={`footer__tagline ${
-                darkMode ? 'footer__tagline-dark' : ''
-              }`}
+              className={`footer__tagline ${darkMode ? 'footer__tagline-dark' : ''
+                }`}
             >
               {t.footerTagline}
             </p>
@@ -136,17 +137,17 @@ function Footer({ darkMode }) {
 
             {/* SOCIALS */}
             <div className="footer__socials">
-                <a href="/" className="footer__social-link">
-                  <Globe size={18} />
-                </a>
+              <a href="/" className="footer__social-link">
+                <Globe size={18} />
+              </a>
 
-                <a href="/" className="footer__social-link">
-                  <Share2 size={18} />
-                </a>
+              <a href="/" className="footer__social-link">
+                <Share2 size={18} />
+              </a>
 
-                <a href="/" className="footer__social-link">
-                  <User size={18} />
-                </a>
+              <a href="/" className="footer__social-link">
+                <User size={18} />
+              </a>
             </div>
           </div>
 
@@ -155,36 +156,32 @@ function Footer({ darkMode }) {
             {/* PRODUCT */}
             <div className="footer__column">
               <h4
-                className={`footer__heading ${
-                  darkMode ? 'footer__heading-dark' : ''
-                }`}
+                className={`footer__heading ${darkMode ? 'footer__heading-dark' : ''
+                  }`}
               >
                 {t.product}
               </h4>
 
               <Link
                 to="/upload"
-                className={`footer__item ${
-                  darkMode ? 'footer__item-dark' : ''
-                }`}
+                className={`footer__item ${darkMode ? 'footer__item-dark' : ''
+                  }`}
               >
                 {t.uploadPhotoFooter}
               </Link>
 
               <Link
                 to="/editor"
-                className={`footer__item ${
-                  darkMode ? 'footer__item-dark' : ''
-                }`}
+                className={`footer__item ${darkMode ? 'footer__item-dark' : ''
+                  }`}
               >
                 {t.aiEditor}
               </Link>
 
               <Link
                 to="/print-preview"
-                className={`footer__item ${
-                  darkMode ? 'footer__item-dark' : ''
-                }`}
+                className={`footer__item ${darkMode ? 'footer__item-dark' : ''
+                  }`}
               >
                 {t.printPreview}
               </Link>
@@ -193,38 +190,34 @@ function Footer({ darkMode }) {
             {/* COMPANY */}
             <div className="footer__column">
               <h4
-                className={`footer__heading ${
-                  darkMode ? 'footer__heading-dark' : ''
-                }`}
+                className={`footer__heading ${darkMode ? 'footer__heading-dark' : ''
+                  }`}
               >
                 {t.company}
               </h4>
 
-              <a
-                href="/privacy"
-                className={`footer__item ${
-                  darkMode ? 'footer__item-dark' : ''
-                }`}
+              <Link
+                to="/privacy"
+                className={`footer__item ${darkMode ? 'footer__item-dark' : ''
+                  }`}
               >
                 {t.privacyPolicy}
-              </a>
+              </Link>
 
-              <a
-                href="/terms"
-                className={`footer__item ${
-                  darkMode ? 'footer__item-dark' : ''
-                }`}
+              <Link
+                to="/terms"
+                className={`footer__item ${darkMode ? 'footer__item-dark' : ''
+                  }`}
               >
                 {t.termsConditions}
-              </a>
+              </Link>
             </div>
 
             {/* CONTACT */}
             <div className="footer__column">
               <h4
-                className={`footer__heading ${
-                  darkMode ? 'footer__heading-dark' : ''
-                }`}
+                className={`footer__heading ${darkMode ? 'footer__heading-dark' : ''
+                  }`}
               >
                 {t.contact}
               </h4>
