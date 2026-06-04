@@ -9,7 +9,6 @@ from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import config
 from app.routes.process_routes import process_bp
-from app.services.errors import ai_error_handler
 
 app = Flask(__name__)
 CORS(app)
@@ -19,36 +18,58 @@ os.makedirs(config.UPLOAD_DIR, exist_ok=True)
 # Blueprints 
 app.register_blueprint(process_bp)
 
-# Health Check
+# Health Checks & Diagnostics
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "python-ai-service"}
-# Face Quality Gate
-@app.route("/face-quality-check", methods=["POST"])
-def face_quality_check():
-    from app.services.face_quality_gate import assess_face_quality
+
+@app.get("/health/liveness")
+def liveness():
+    # Simple check that the server process is alive
+    return jsonify({"status": "alive", "message": "Service process is running."}), 200
+
+@app.get("/health/readiness")
+def readiness():
+    diagnostics = {
+        "status": "ready",
+        "dependencies": {},
+        "storage": {}
+    }
     
-    data = request.get_json()
-    file_path = data.get("file_path")
-    
-    if not file_path:
-        return jsonify({"error": "file_path is required"}), 400
-    
+    # Check OpenCV/Cv2 dependency
     try:
-        report = assess_face_quality(file_path)
-        return jsonify({
-            "passed": report.passed,
-            "face_count": report.face_count,
-            "blur_score": report.blur_score,
-            "rejection_code": report.rejection_code,
-            "rejection_reason": report.rejection_reason,
-            "user_hint": report.user_hint,
-        })
+        import cv2
+        diagnostics["dependencies"]["opencv"] = "available"
+        diagnostics["dependencies"]["opencv_version"] = cv2.__version__
+    except ImportError:
+        diagnostics["dependencies"]["opencv"] = "missing"
+        diagnostics["status"] = "unhealthy"
+
+    # Check PIL dependency
+    try:
+        from PIL import Image
+        diagnostics["dependencies"]["pillow"] = "available"
+    except ImportError:
+        diagnostics["dependencies"]["pillow"] = "missing"
+        diagnostics["status"] = "unhealthy"
+
+    # Check file system write access in upload dir
+    try:
+        test_file = os.path.join(config.UPLOAD_DIR, ".readiness_test")
+        with open(test_file, "w") as f:
+            f.write("test")
+        os.remove(test_file)
+        diagnostics["storage"]["upload_dir_writable"] = True
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        diagnostics["storage"]["upload_dir_writable"] = False
+        diagnostics["storage"]["error"] = str(e)
+        diagnostics["status"] = "unhealthy"
+
+    code = 200 if diagnostics["status"] == "ready" else 503
+    return jsonify(diagnostics), code
+
 # Sheet Generator
 @app.route("/generate-sheet", methods=["POST"])
-@ai_error_handler
 def generate_sheet():
     from app.services.sheet_generator import generate_a4_sheet
     
@@ -66,16 +87,20 @@ def generate_sheet():
     os.makedirs(output_dir, exist_ok=True)
     output_path= os.path.join(output_dir, f"sheet_{preset_id}.jpg")
 
-    from app.services.sheet_generator import generate_a4_sheet
-    saved = generate_a4_sheet(
-        photo_path= photo_path,
-        preset_id= preset_id,
-        quantity= quantity,
-        bg_color= bg_color,
-        draw_guides= draw_guides,
-        output_path= output_path,
-    )
-    return send_file(saved, mimetype="image/jpeg")
+    try:
+        from app.services.sheet_generator import generate_a4_sheet
+        saved = generate_a4_sheet(
+            photo_path= photo_path,
+            preset_id= preset_id,
+            quantity= quantity,
+            bg_color= bg_color,
+            draw_guides= draw_guides,
+            output_path= output_path,
+        )
+        return send_file(saved, mimetype="image/jpeg")
+
+    except (ValueError, FileNotFoundError) as e:
+        return jsonify({"error": str(e)}), 400
 
 # Run 
 if __name__ == "__main__":
