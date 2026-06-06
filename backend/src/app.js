@@ -31,7 +31,13 @@ app.set('trust proxy', 1);
 app.use('/api', apiLimiter);
 
 
-app.use(helmet());
+app.use(helmet({
+    hsts: {
+        maxAge: 31536000,
+        includeSubDomains: true,
+        preload: true
+    }
+}));
 const allowedOrigins = config.CORS_ORIGIN.split(',').map(o => o.trim());
 
 app.use(
