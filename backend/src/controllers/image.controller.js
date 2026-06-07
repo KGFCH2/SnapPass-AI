@@ -102,9 +102,6 @@ export const processImage = async (req, res, next) => {
 
     // Forward to Python AI service
     const form = new FormData();
-
-    // Forward to Python AI service
-    const form = new FormData();
     form.append("image", fs.createReadStream(filePath));
     form.append("background_colour", backgroundColour);
     form.append("photo_size_preset", photoSizePreset);
