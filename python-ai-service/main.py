@@ -105,14 +105,14 @@ def face_quality_check():
 def generate_sheet():
     from app.services.sheet_generator import generate_a4_sheet
     
-    data= request.get_json()
+    data = request.get_json()
     raw_photo_path = data.get("photo_path")
     # Sanitize preset_id to alphanumeric + dash/underscore only so it cannot
     # inject path separators into the output filename (e.g. '../evil').
     preset_id = re.sub(r"[^a-zA-Z0-9_\-]", "", data.get("preset_id", "35x45")) or "35x45"
-    quantity= int(data.get("quantity", 8))
-    bg_color= tuple(data.get("bg_color", [255, 255, 255]))
-    draw_guides= bool(data.get("draw_guides", True))
+    quantity = int(data.get("quantity", 8))
+    bg_color = tuple(data.get("bg_color", [255, 255, 255]))
+    draw_guides = bool(data.get("draw_guides", True))
 
     if not raw_photo_path:
         return jsonify({"error": "photo_path is required"}), 400
@@ -122,20 +122,20 @@ def generate_sheet():
     except ValueError:
         return jsonify({"error": "Invalid photo_path."}), 400
 
-    output_dir= os.environ.get("OUTPUT_DIR", "outputs")
+    output_dir = os.environ.get("OUTPUT_DIR", "outputs")
     os.makedirs(output_dir, exist_ok=True)
     # Include a UUID in the filename so concurrent requests using the same
     # preset_id do not race on the same file path.
-    output_path= os.path.join(output_dir, f"sheet_{preset_id}_{uuid.uuid4().hex}.jpg")
+    output_path = os.path.join(output_dir, f"sheet_{preset_id}_{uuid.uuid4().hex}.jpg")
 
     from app.services.sheet_generator import generate_a4_sheet
     saved = generate_a4_sheet(
-        photo_path= photo_path,
-        preset_id= preset_id,
-        quantity= quantity,
-        bg_color= bg_color,
-        draw_guides= draw_guides,
-        output_path= output_path,
+        photo_path=photo_path,
+        preset_id=preset_id,
+        quantity=quantity,
+        bg_color=bg_color,
+        draw_guides=draw_guides,
+        output_path=output_path,
     )
 
     # Build the response first, then register cleanup via call_on_close so
@@ -154,6 +154,7 @@ def generate_sheet():
     response.call_on_close(_delete_sheet)
     return response
 
-# Run 
+
+# Run
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=config.PORT, debug=config.DEBUG)
