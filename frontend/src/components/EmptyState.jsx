@@ -12,6 +12,7 @@ function EmptyState({
 }) {
   const navigate = useNavigate();
 
+  // Accessible empty state landmarks
   return (
     <div className={`empty-state ${darkMode? "empty-state-dark": ""}`}>
       <div className={`empty-state__illustration ${darkMode? "empty-state__illustration-dark" : "empty-state__illustration-light" }`} aria-hidden="true">
