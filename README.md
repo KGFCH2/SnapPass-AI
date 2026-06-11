@@ -1,4 +1,8 @@
-<div align="center">
+# SnapPass-AI
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI Status](https://img.shields.io/github/actions/workflow/status/KGFCH2/SnapPass-AI/docker-ci.yml?branch=master)](https://github.com/KGFCH2/SnapPass-AI/actions)
+
 
 <h1>📷 SnapPass AI</h1>
 
